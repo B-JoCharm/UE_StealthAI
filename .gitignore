@@ -1,0 +1,31 @@
+# Binaries
+Binaries/
+Build/
+
+# Intermediate
+Intermediate/
+
+# Saved
+Saved/
+
+# DerivedDataCache
+DerivedDataCache/
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.sln.docstates
+
+# Rider
+.idea/
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Packed builds
+*.pak
+*.ucas
+*.utoc
