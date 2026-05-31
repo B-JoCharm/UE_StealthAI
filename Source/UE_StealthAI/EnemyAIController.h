@@ -17,4 +17,18 @@ class UE_STEALTHAI_API AEnemyAIController : public AAIController
 
 public:
 	virtual void OnPossess(APawn* InPawn) override;
+	virtual void Tick(float DeltaTime) override;
+
+private:
+	//현재 순찰 목표 인덱스
+	int32 CurrentPatrolPointIndex = 0;
+
+	//다음 순찰 포인트로 이동
+	void MoveToNextPatrolPoint();
+
+	//목적지 도착 확인
+	bool HasReachedDestination() const;
+
+	//빙의된 EnemyCharacter 포인터
+	class AEnemyCharacter* EnemyCharacter = nullptr;
 };
