@@ -34,6 +34,10 @@ public:
 	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "Movement")
 	float ChaseSpeed = 400.f;
 
+	// 순찰 포인트 배열 (BP/에디터에서 할당)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+	TArray<AActor*> PatrolPoints;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
