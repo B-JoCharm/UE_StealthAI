@@ -1,0 +1,46 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Character.h"
+#include "EnemyCharacter.generated.h"
+
+UENUM(BlueprintType)
+enum class EAIState : uint8
+{
+	Patrol	 UMETA(DisplayName = "Patrol"),
+	Chase	 UMETA(DisplayName = "Chase"),
+	Search	 UMETA(DisplayName = "Search"),
+};
+
+UCLASS()
+class UE_STEALTHAI_API AEnemyCharacter : public ACharacter
+{
+	GENERATED_BODY()
+
+public:
+	// Sets default values for this character's properties
+	AEnemyCharacter();
+
+	// 현재 AI 상태
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
+	EAIState AIState = EAIState::Patrol;
+
+	// 이동 속도
+	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "Movement")
+	float PatrolSpeed = 200.f;
+
+	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "Movement")
+	float ChaseSpeed = 400.f;
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+
+};
