@@ -10,8 +10,7 @@ AEnemyCharacter::AEnemyCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	// 초기 이동 속도 설정 (순찰속도)
-	GetCharacterMovement()->MaxWalkSpeed = PatrolSpeed;
+	
 }
 
 // Called when the game starts or when spawned
@@ -19,6 +18,8 @@ void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	// 초기 이동 속도 설정 (순찰속도)
+	GetCharacterMovement()->MaxWalkSpeed = PatrolSpeed;
 }
 
 // Called every frame
