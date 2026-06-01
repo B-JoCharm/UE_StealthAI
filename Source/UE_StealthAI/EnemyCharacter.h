@@ -42,9 +42,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Detection")
 	float DetectionAngle = 60.f;
 
-	// 순찰 포인트 배열 (BP/에디터에서 할당)
+	// 순찰 포인트 배열 (BP에서 할당)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	TArray<AActor*> PatrolPoints;
+
+	// Behavior Tree 에셋 (BP에서 할당)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+	class UBehaviorTree* BehaviorTreeAsset;
 
 protected:
 	// Called when the game starts or when spawned

@@ -4,11 +4,12 @@
 #include "EnemyAIController.h"
 #include "EnemyCharacter.h"
 #include "StealthCharacter.h"
-#include "Engine/TargetPoint.h"
 #include "Navigation/PathFollowingComponent.h"
-#include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 void AEnemyAIController::OnPossess(APawn* InPawn)
 {
@@ -18,7 +19,11 @@ void AEnemyAIController::OnPossess(APawn* InPawn)
 	if (AEnemyCharacter* Enemy = Cast<AEnemyCharacter>(InPawn))
 	{
 		EnemyCharacter = Enemy;
-		MoveToNextPatrolPoint();
+
+		if (Enemy->BehaviorTreeAsset)
+		{
+			RunBehaviorTree(Enemy->BehaviorTreeAsset);
+		}
 	}
 }
 
@@ -33,26 +38,6 @@ void AEnemyAIController::Tick(float DeltaTime)
 	}
 
 	DetectPlayer();
-
-	if (EnemyCharacter && EnemyCharacter -> AIState == EAIState::Patrol)
-	{
-		if (HasReachedDestination())
-		{
-			MoveToNextPatrolPoint();
-		}
-	}
-}
-
-void AEnemyAIController::MoveToNextPatrolPoint()
-{
-	if (!EnemyCharacter) return;
-	if (EnemyCharacter->PatrolPoints.Num() == 0) return;
-	
-	AActor* TargetPoint = EnemyCharacter->PatrolPoints[CurrentPatrolPointIndex];
-	MoveToActor(TargetPoint, 50.f); // 50.f는 도착 허용 반경입니다.
-
-	// 순찰 포인트 인덱스 업데이트
-	CurrentPatrolPointIndex = (CurrentPatrolPointIndex + 1) % EnemyCharacter->PatrolPoints.Num();
 }
 
 bool AEnemyAIController::HasReachedDestination() const
@@ -69,22 +54,32 @@ void AEnemyAIController::DetectPlayer()
 
 	if (IsPlayerInSight())
 	{
-
 		// 플레이어 발견 -> Chase 상태로 전환
 		EnemyCharacter->AIState = EAIState::Chase;
 
-		if (TargetPlayer)
+		// Chase 속도로 전환
+		EnemyCharacter->GetCharacterMovement()->MaxWalkSpeed = EnemyCharacter->ChaseSpeed;
+
+		if(GetBlackboardComponent())
 		{
-			MoveToActor(TargetPlayer, 50.f); // 플레이어를 추적
+			GetBlackboardComponent()->SetValueAsObject(TEXT("TargetPlayer"), TargetPlayer);
 		}
 	}
 	else
 	{
-		// 플레이어 시야에서 사라짐 -> Patrol 상태로 전환
+		// 플레이어 시야에서 사라짐 -> Blackboard에서 TargetPlayer 제거
+		if(GetBlackboardComponent())
+		{
+			GetBlackboardComponent()->ClearValue(TEXT("TargetPlayer"));
+		}
+
+		// Patrol 상태로 전환
 		if (EnemyCharacter->AIState == EAIState::Chase)
 		{
 			EnemyCharacter->AIState = EAIState::Patrol;
-			MoveToNextPatrolPoint();
+
+			// Patrol 속도로 전환
+			EnemyCharacter->GetCharacterMovement()->MaxWalkSpeed = EnemyCharacter->PatrolSpeed;
 		}
 	}
 }
@@ -92,7 +87,6 @@ void AEnemyAIController::DetectPlayer()
 bool AEnemyAIController::IsPlayerInSight() const
 {
 	if (!EnemyCharacter) return false;
-
 	if (!TargetPlayer) return false;
 
 	// 거리 확인
@@ -111,7 +105,6 @@ bool AEnemyAIController::IsPlayerInSight() const
 	FHitResult HitResult;
 	FVector Start = EnemyCharacter->GetActorLocation();
 	FVector End = TargetPlayer->GetActorLocation();
-
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(EnemyCharacter); // 자기 자신은 무시
 
