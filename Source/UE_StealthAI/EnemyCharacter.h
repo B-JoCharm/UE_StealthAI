@@ -29,10 +29,18 @@ public:
 
 	// 이동 속도
 	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "Movement")
-	float PatrolSpeed = 200.f;
+	float PatrolSpeed = 200.f; 
 
 	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "Movement")
 	float ChaseSpeed = 400.f;
+
+	// 감지 거리 (BP에서 튜닝 가능)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Detection")
+	float DetectionRange = 1000.f;
+
+	// 시야 각 (BP에서 튜닝 가능)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Detection")
+	float DetectionAngle = 60.f;
 
 	// 순찰 포인트 배열 (BP/에디터에서 할당)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
