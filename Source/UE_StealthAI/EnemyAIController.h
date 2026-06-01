@@ -19,16 +19,26 @@ public:
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void Tick(float DeltaTime) override;
 
+
 private:
-	//현재 순찰 목표 인덱스
+	// 현재 순찰 목표 인덱스
 	int32 CurrentPatrolPointIndex = 0;
 
-	//다음 순찰 포인트로 이동
+	// 다음 순찰 포인트로 이동
 	void MoveToNextPatrolPoint();
 
-	//목적지 도착 확인
+	// 목적지 도착 확인
 	bool HasReachedDestination() const;
 
-	//빙의된 EnemyCharacter 포인터
+	// 플레이어 감지 함수
+	void DetectPlayer();
+
+	// 시야 범위 안에 플레이어가 있는지 확인
+	bool IsPlayerInSight() const;
+
+	// 빙의된 EnemyCharacter 포인터
 	class AEnemyCharacter* EnemyCharacter = nullptr;
+
+	// 감지된 플레이어 포인터
+	class AStealthCharacter* TargetPlayer = nullptr;
 };
