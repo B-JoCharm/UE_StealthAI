@@ -50,6 +50,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	class UBehaviorTree* BehaviorTreeAsset;
 
+	// 플레이어 감지 거리
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Detection")
+	float CatchDistance = 150.f;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
