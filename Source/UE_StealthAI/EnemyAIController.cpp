@@ -64,6 +64,17 @@ void AEnemyAIController::DetectPlayer()
 		{
 			GetBlackboardComponent()->SetValueAsObject(TEXT("TargetPlayer"), TargetPlayer);
 		}
+
+		// 플레이어 잡힘 이벤트
+		if (TargetPlayer)
+		{
+			float DistToPlayer = FVector::Dist(EnemyCharacter->GetActorLocation(), TargetPlayer->GetActorLocation());
+
+			if (DistToPlayer < EnemyCharacter->CatchDistance)
+			{
+				OnPlayerCaught.Broadcast();
+			}
+		}
 	}
 	else
 	{

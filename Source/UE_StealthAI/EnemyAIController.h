@@ -6,9 +6,10 @@
 #include "AIController.h"
 #include "EnemyAIController.generated.h"
 
-/**
- * 
- */
+
+// 플레이어 잡힘 델리게이트
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerCaught);
+
 UCLASS()
 class UE_STEALTHAI_API AEnemyAIController : public AAIController
 {
@@ -24,6 +25,10 @@ public:
 
 	// 목적지 도착 확인
 	bool HasReachedDestination() const;
+
+	// 플레이어 잡힘 이벤트
+	UPROPERTY(BlueprintAssignable, Category = "GameRules")
+	FOnPlayerCaught OnPlayerCaught;
 
 private:
 	
