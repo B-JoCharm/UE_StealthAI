@@ -12,6 +12,16 @@
 				"Engine",
 				"AIModule"
 			]
+		},
+		{
+			"Name": "UE_StealthAIEditor",
+			"Type": "Editor",
+			"LoadingPhase": "PostEngineInit",
+			"AdditionalDependencies": [
+				"Engine",
+				"CoreUObject",
+				"UMG"
+			]
 		}
 	],
 	"Plugins": [

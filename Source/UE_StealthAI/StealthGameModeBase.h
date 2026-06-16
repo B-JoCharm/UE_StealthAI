@@ -25,6 +25,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "GameRules")
 	void RestartGame();
 
+	// 다음 스테이지로 이동
+	UFUNCTION(BlueprintCallable, Category = "GameRules")
+	void NextStage();
+
+	// 스테이지 맵 이름 배열 (BP에서 할당)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GameRules")
+	TArray<FName> StageMapNames;
+
+	// 현재 스테이지 인덱스
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GameRules")
+	int32 CurrentStageIndex = 0;
+
 	// EnemyAIController의 OnPlayerCaught 델리게이트 바인딩
 	UFUNCTION()
 	void OnPlayerCaughtHandler();
