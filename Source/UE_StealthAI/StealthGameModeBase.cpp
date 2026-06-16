@@ -86,3 +86,25 @@ void AStealthGameModeBase::OnPlayerCaughtHandler()
 {
     OnGameLose();
 }
+
+void AStealthGameModeBase::NextStage()
+{
+	if (StageMapNames.Num() == 0) return;
+
+    CurrentStageIndex++;
+
+    // 마지막 스테이지면 처음으로 돌아가기
+    if(CurrentStageIndex >= StageMapNames.Num())
+    {
+        CurrentStageIndex = 0;
+	}
+
+    bGameOver = false;
+	APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+    if (PC)
+    {
+        PC->bShowMouseCursor = false;
+    }
+
+	UGameplayStatics::OpenLevel(this, StageMapNames[CurrentStageIndex]);
+}
