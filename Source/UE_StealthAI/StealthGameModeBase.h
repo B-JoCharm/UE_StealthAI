@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "StealthGameInstance.h"
+#include "StageManager.h"
 #include "StealthGameModeBase.generated.h"
 
 UCLASS()
@@ -48,6 +50,9 @@ public:
 	// 패배 UI 위젯 클래스 (BP에서 할당)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	TSubclassOf<class UUserWidget> GameLoseWidgetClass;
+
+	UPROPERTY()
+	UUserWidget* ActiveGameWinWidget;
 
 protected:
 	// Called when the game starts or when spawned
