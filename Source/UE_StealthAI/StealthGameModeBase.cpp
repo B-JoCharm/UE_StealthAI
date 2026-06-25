@@ -1,24 +1,31 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "StealthGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "EnemyAIController.h"
 #include "EngineUtils.h"
 #include "Blueprint/UserWidget.h"
-#include "EnemyCharacter.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/Character.h"
+#include "Framework/Application/SlateApplication.h"
+#include "Engine/GameViewportClient.h"
 
 void AStealthGameModeBase::BeginPlay()
 {
     Super::BeginPlay();
 
-    // 맵의 모든 EnemyAIController에 델리게이트 바인딩
+    GetWorldTimerManager().SetTimerForNextTick([this]()
+        {
+            if (UGameViewportClient* ViewportClient = GetWorld()->GetGameViewport())
+            {
+                ViewportClient->SetMouseCaptureMode(EMouseCaptureMode::CapturePermanently);
+                ViewportClient->SetHideCursorDuringCapture(true);
+                FSlateApplication::Get().SetAllUserFocusToGameViewport();
+            }
+        });
+
     for (TActorIterator<AEnemyAIController> It(GetWorld()); It; ++It)
     {
-		It->OnPlayerCaught.AddDynamic(this, &AStealthGameModeBase::OnPlayerCaughtHandler);
-	}
+        It->OnPlayerCaught.AddDynamic(this, &AStealthGameModeBase::OnPlayerCaughtHandler);
+    }
 }
 
 void AStealthGameModeBase::OnGameWin()
@@ -26,23 +33,21 @@ void AStealthGameModeBase::OnGameWin()
     if (bGameOver) return;
     bGameOver = true;
 
-    UE_LOG(LogTemp, Warning, TEXT("Game Win!"));
-
-    // 승리 UI 표시
     if (GameWinWidgetClass)
     {
-        UUserWidget* GameWinWidget = CreateWidget<UUserWidget>(GetWorld(), GameWinWidgetClass);
-        if (GameWinWidget)
+        ActiveGameWinWidget = CreateWidget<UUserWidget>(GetWorld(), GameWinWidgetClass);
+        if (ActiveGameWinWidget)
         {
-            GameWinWidget->AddToViewport();
-		}
+            ActiveGameWinWidget->AddToViewport();
+        }
     }
 
-	APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+    APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
     if (PC)
     {
-		// UI 클릭을 위한 마우스 활성화
-		PC->bShowMouseCursor = true;
+        FInputModeUIOnly InputMode;
+        PC->SetInputMode(InputMode);
+        PC->bShowMouseCursor = true;
     }
 }
 
@@ -51,9 +56,6 @@ void AStealthGameModeBase::OnGameLose()
     if (bGameOver) return;
     bGameOver = true;
 
-    UE_LOG(LogTemp, Warning, TEXT("Game Lose!"));
-
-    // 패배 UI 표시
     if (GameLoseWidgetClass)
     {
         UUserWidget* GameLoseWidget = CreateWidget<UUserWidget>(GetWorld(), GameLoseWidgetClass);
@@ -66,9 +68,10 @@ void AStealthGameModeBase::OnGameLose()
     APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
     if (PC)
     {
-        // UI 클릭을 위한 마우스 활성화
+        FInputModeUIOnly InputMode;
+        PC->SetInputMode(InputMode);
         PC->bShowMouseCursor = true;
-	}
+    }
 }
 
 void AStealthGameModeBase::RestartGame()
@@ -89,22 +92,18 @@ void AStealthGameModeBase::OnPlayerCaughtHandler()
 
 void AStealthGameModeBase::NextStage()
 {
-	if (StageMapNames.Num() == 0) return;
-
-    CurrentStageIndex++;
-
-    // 마지막 스테이지면 처음으로 돌아가기
-    if(CurrentStageIndex >= StageMapNames.Num())
+    if (ActiveGameWinWidget)
     {
-        CurrentStageIndex = 0;
-	}
-
-    bGameOver = false;
-	APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
-    if (PC)
-    {
-        PC->bShowMouseCursor = false;
+        ActiveGameWinWidget->RemoveFromParent();
+        ActiveGameWinWidget = nullptr;
     }
 
-	UGameplayStatics::OpenLevel(this, StageMapNames[CurrentStageIndex]);
+    bGameOver = false;
+
+    UStealthGameInstance* GI = Cast<UStealthGameInstance>(UGameplayStatics::GetGameInstance(this));
+    if (GI && GI->GetStageManager())
+    {
+        GI->GetStageManager()->ClearCurrentStage();
+        GI->GetStageManager()->LoadNextStage(this);
+    }
 }
