@@ -33,13 +33,19 @@ public:
 	void LoadNextStage(UObject* WorldContext);
 
 	// 특정 스테이지 로드
+	UFUNCTION(BlueprintCallable, Category = "Stage")
 	void LoadStage(int32 World, int32 Stage, UObject* WorldContext);
 
 	// 세이브/로드
 	void SaveGame();
+
+	UFUNCTION(BlueprintCallable, Category = "Stage")
 	void LoadGame();
 
+	UFUNCTION(BlueprintCallable, Category = "Stage")
 	int32 GetCurrentWorld() const { return CurrentWorld; }
+
+	UFUNCTION(BlueprintCallable, Category = "Stage")
 	int32 GetCurrentStage() const { return CurrentStage; }
 
 private:
