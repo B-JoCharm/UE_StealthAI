@@ -140,6 +140,8 @@ void UStageManager::LoadStage(int32 World, int32 Stage, UObject* WorldContext)
     CurrentWorld = World;
     CurrentStage = Stage;
 
+    SaveGame();
+
     FString MapPath = StageMap[Key];
     UGameplayStatics::OpenLevel(WorldContext, FName(*MapPath), true);
 }
